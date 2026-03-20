@@ -110,6 +110,7 @@ function init() {
   bindEvents();
   renderSelectedChips();
   restoreDraft();
+  fetchConfiguredSubjectsIfNeeded();
 }
 
 function cacheElements() {
