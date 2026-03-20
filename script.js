@@ -867,7 +867,7 @@ function updateGraphFooter() {
   const okCount = state.loadLog.filter(item => item.ok).length;
   const missing = state.diagnostics.missingCourseAssignments.length;
   if (!state.loadLog.length) {
-    el.graphLoadLabel.textContent = 'Demo + local JSON data ready';
+    el.graphLoadLabel.textContent = 'local JSON data ready';
   } else {
     el.graphLoadLabel.textContent = `${okCount} JSON file${okCount === 1 ? '' : 's'} loaded · ${loaded.toLocaleString()} standards processed${missing ? ` · ${missing} missing course links` : ''}`;
   }
