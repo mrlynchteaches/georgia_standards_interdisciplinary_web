@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interdisciplinary Standards Web</title>
+  <meta name="description" content="A teacher-friendly interdisciplinary standards explorer for Georgia standards." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#mainContent">Skip to main content</a>
+
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Georgia Standards Connection Tool</p>
+      <h1>Interdisciplinary Standards Web</h1>
+      <p class="subhead">Search by standard, course, grade band, or keyword—then visualize cross-subject connections in a radial web.</p>
+    </div>
+    <div class="topbar-actions">
+      <button id="saveMapBtn" class="btn btn-secondary" type="button">Save lesson map</button>
+      <button id="printBtn" class="btn btn-secondary" type="button">Print / PDF</button>
+      <button id="resetBtn" class="btn btn-ghost" type="button">Reset</button>
+    </div>
+  </header>
+
+  <main id="mainContent" class="layout">
+    <section class="control-panel card" aria-labelledby="searchHeading">
+      <div class="card-header">
+        <h2 id="searchHeading">1. Build a search</h2>
+        <p>Start with official standards, manual learning targets, or both.</p>
+      </div>
+
+      <form id="searchForm" class="controls-grid" autocomplete="off">
+        <div class="field-group">
+          <label for="subjectSelect">Subject</label>
+          <select id="subjectSelect" name="subject">
+            <option value="">All subjects</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="gradeBandSelect">Grade band</label>
+          <select id="gradeBandSelect" name="gradeBand">
+            <option value="">All grade bands</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="courseSelect">Course</label>
+          <select id="courseSelect" name="course">
+            <option value="">All courses</option>
+          </select>
+        </div>
+
+        <div class="field-group field-group-wide">
+          <label for="keywordInput">Keyword search</label>
+          <input id="keywordInput" name="keyword" type="text" placeholder="Try evidence, data, change, modeling, argument, culture..." />
+        </div>
+
+        <div class="field-group standards-picker field-group-wide">
+          <label for="standardSearchInput">Search and add standards</label>
+          <div class="picker-shell">
+            <input id="standardSearchInput" type="text" placeholder="Search standards by code or description" aria-describedby="pickerHelp" />
+            <button id="openPickerBtn" class="btn btn-secondary" type="button">Browse</button>
+          </div>
+          <p id="pickerHelp" class="field-help">Select multiple standards for a unit. Use the current subject / grade / course filters to narrow the list.</p>
+          <div id="pickerResults" class="picker-results" role="listbox" aria-label="Matching standards"></div>
+          <div id="selectedStandards" class="selected-chips" aria-live="polite"></div>
+        </div>
+
+        <div class="field-group field-group-wide">
+          <label for="manualTargets">Manual learning targets (optional)</label>
+          <textarea id="manualTargets" name="manualTargets" rows="4" placeholder="Enter one learning target per line if you want to include teacher-written targets in the connection search."></textarea>
+        </div>
+
+        <div class="field-group field-group-wide toolbar-inline">
+          <button id="findConnectionsBtn" class="btn btn-primary" type="submit">2. Find connections</button>
+          <button id="loadDemoBtn" class="btn btn-secondary" type="button">Load demo data</button>
+          <span id="statusBadge" class="status-badge" aria-live="polite">Ready</span>
+        </div>
+      </form>
+
+      <details class="config-panel">
+        <summary>JSON file configuration (replace live APIs with local exports)</summary>
+        <p class="config-note">Use local JSON file paths here (for example, data/mathematics.json). The page now reads local JSON files instead of live CASE API endpoints, and demo data is still available for testing.</p>
+        <div id="apiConfigGrid" class="api-config-grid"></div>
+        <div class="toolbar-inline">
+          <button id="saveConfigBtn" class="btn btn-secondary" type="button">Save JSON file config</button>
+          <button id="clearConfigBtn" class="btn btn-ghost" type="button">Reset JSON file config</button>
+        </div>
+      </details>
+    </section>
+
+    <section class="workspace card">
+      <div class="workspace-header">
+        <div>
+          <h2>3. Explore the web</h2>
+          <p>Selected standards anchor the map. Disciplines are the largest bubbles, courses are the second layer, and matching standards appear at the outer layer.</p>
+        </div>
+        <div class="legend" aria-label="Connection strength legend">
+          <span><i class="dot dot-strong"></i>Strong</span>
+          <span><i class="dot dot-medium"></i>Medium</span>
+          <span><i class="dot dot-weak"></i>Weak</span>
+        </div>
+      </div>
+
+      <div class="workspace-grid">
+        <div class="viz-shell">
+          <div id="emptyState" class="empty-state">
+            <h3>No map yet</h3>
+            <p>Choose standards or add manual learning targets, then click <strong>Find connections</strong>.</p>
+          </div>
+          <div id="graphContainer" class="graph-container" aria-label="Interactive standards web"></div>
+        </div>
+
+        <aside class="side-panel" aria-labelledby="resultsHeading">
+          <div class="side-panel-header sticky">
+            <div>
+              <h2 id="resultsHeading">Connected standards</h2>
+              <p id="resultsSubhead">Connections will appear here.</p>
+            </div>
+          </div>
+
+          <div class="filters card inset-card">
+            <h3>Filter results</h3>
+            <div class="filters-grid">
+              <div class="field-group">
+                <label for="filterSubject">Subject</label>
+                <select id="filterSubject">
+                  <option value="">All</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label for="filterGradeBand">Grade band</label>
+                <select id="filterGradeBand">
+                  <option value="">All</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label for="filterCourse">Course</label>
+                <select id="filterCourse">
+                  <option value="">All</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label for="filterStrength">Strength</label>
+                <select id="filterStrength">
+                  <option value="">All</option>
+                  <option value="strong">Strong</option>
+                  <option value="medium">Medium</option>
+                  <option value="weak">Weak</option>
+                </select>
+              </div>
+              <div class="field-group field-group-wide">
+                <label for="filterKeyword">Keyword</label>
+                <input id="filterKeyword" type="text" placeholder="Filter by keyword, theme, or skill" />
+              </div>
+            </div>
+          </div>
+
+          <div id="resultsList" class="results-list" aria-live="polite"></div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <template id="resultCardTemplate">
+    <article class="result-card card inset-card">
+      <div class="result-card-top">
+        <div>
+          <p class="result-meta"></p>
+          <h3 class="result-title"></h3>
+        </div>
+        <span class="strength-pill"></span>
+      </div>
+      <p class="result-description"></p>
+      <div class="result-explanation-block">
+        <h4>Why it connects</h4>
+        <p class="result-explanation"></p>
+      </div>
+      <div class="tag-row"></div>
+    </article>
+  </template>
+
+  <dialog id="nodeDialog" class="node-dialog">
+    <form method="dialog" class="dialog-shell">
+      <div class="dialog-header">
+        <h2 id="dialogTitle">Connection details</h2>
+        <button class="icon-btn" value="cancel" aria-label="Close details">✕</button>
+      </div>
+      <div id="dialogBody" class="dialog-body"></div>
+    </form>
+  </dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>
