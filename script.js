@@ -14,6 +14,10 @@ const STORAGE_KEYS = {
   draft: 'standardsWeb.draft.v3'
 };
 
+const data = await loadJsonFile(STATE_FUNDED_COURSE_LIST_JSON, 'state_funded_course_list');
+
+};
+
 const ENDPOINT_DEFINITIONS = [
   { key: 'mathematics', group: 'Core disciplines', label: 'Mathematics', subjectKey: 'mathematics', subjectLabel: 'Mathematics', endpoint: 'mathematics.json' },
   { key: 'science', group: 'Core disciplines', label: 'Science', subjectKey: 'science', subjectLabel: 'Science', endpoint: 'science.json' },
