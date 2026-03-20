@@ -53,6 +53,7 @@ const ENDPOINT_DEFINITIONS = [
 const DEFAULT_ENDPOINTS = Object.fromEntries(ENDPOINT_DEFINITIONS.map(item => [item.key, item.endpoint]));
 
 //is this the issue? I think the site only pulling these demo standards. 
+//Site was definitely pulling only the demo standards that were listed here. I've removed them.
 
 //Do I need to add this for all subjects? Easy enough if I do...
 
