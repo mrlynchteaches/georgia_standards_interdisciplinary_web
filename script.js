@@ -26,7 +26,7 @@ const ENDPOINT_DEFINITIONS = [
   { key: 'fineArtsDance', group: 'Fine Arts', label: 'Dance', subjectKey: 'fineArts', subjectLabel: 'Fine Arts', courseLabel: 'Dance', subdiscipline: 'Dance', endpoint: 'fineArtsDance.json' },
   { key: 'fineArtsDramaticTheatre', group: 'Fine Arts', label: 'Dramatic Arts / Theatre', subjectKey: 'fineArts', subjectLabel: 'Fine Arts', courseLabel: 'Dramatic Arts / Theatre', subdiscipline: 'Dramatic Arts / Theatre', endpoint: 'fineArtsDramaticTheatre.json' },
   { key: 'fineArtsMusic', group: 'Fine Arts', label: 'Music', subjectKey: 'fineArts', subjectLabel: 'Fine Arts', courseLabel: 'Music', subdiscipline: 'Music', endpoint: 'fineArtsMusic.json' },
-  { key: 'fineArtsVisualArt', group: 'Fine Arts', label: 'Visual Art', subjectKey: 'fineArts', subjectLabel: 'Fine Arts', courseLabel: 'Visual Art', subdiscipline: 'Visual Art', endpoint: 'fineArtsVisualArt.json' },
+  { key: 'fineArtsVisualArt', group: 'Fine Arts', label: 'Visual Art', subjectKey: 'fineArts', subjectLabel: 'Fine Arts', courseLabel: 'Visual Art', subdiscipline: 'Visual Art', endpoint: 'fineArtsVisualArts.json' },
   { key: 'ctaeAgricultureFoodNaturalResources', group: 'CTAE clusters', label: 'Agriculture, Food, and Natural Resources', subjectKey: 'ctae', subjectLabel: 'CTAE', cluster: 'Agriculture, Food, and Natural Resources', courseLabel: 'Agriculture, Food, and Natural Resources', endpoint: 'ctaeAgricultureFoodNaturalResources.json' },
   { key: 'ctaeArchitectureConstruction', group: 'CTAE clusters', label: 'Architecture and Construction', subjectKey: 'ctae', subjectLabel: 'CTAE', cluster: 'Architecture and Construction', courseLabel: 'Architecture and Construction', endpoint: 'ctaeArchitectureConstruction.json' },
   { key: 'ctaeAudioVideoTechnologyCommunication', group: 'CTAE clusters', label: 'Arts, Audio-Video Technology & Communications', subjectKey: 'ctae', subjectLabel: 'CTAE', cluster: 'Arts, Audio-Video Technology & Communications', courseLabel: 'Arts, Audio-Video Technology & Communications', endpoint: 'ctaeAudioVideoTechnologyCommunication.json' },
@@ -122,7 +122,6 @@ function buildStaticUi() {
   fillSelect(el.filterSubject, SUBJECTS.map(s => ({ value: s.label, label: s.label })), 'All');
   fillSelect(el.gradeBandSelect, collectGradeBandOptions(), 'All grade bands');
   fillSelect(el.filterGradeBand, collectGradeBandOptions(), 'All');
-  buildApiConfigGrid();
   refreshCourseOptions();
   refreshPickerResults();
 }
@@ -140,8 +139,6 @@ function bindEvents() {
   el.saveMapBtn.addEventListener('click', saveLessonMap);
   el.printBtn.addEventListener('click', () => window.print());
   el.resetBtn.addEventListener('click', resetAll);
-  el.saveConfigBtn.addEventListener('click', saveEndpointConfigFromUi);
-  el.clearConfigBtn.addEventListener('click', clearEndpointConfig);
   window.addEventListener('beforeunload', saveDraft);
   window.addEventListener('resize', debounce(() => { if (state.results.length) renderGraph(); }, 150));
 }
