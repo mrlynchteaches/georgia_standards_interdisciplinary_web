@@ -52,6 +52,8 @@ const ENDPOINT_DEFINITIONS = [
 
 const DEFAULT_ENDPOINTS = Object.fromEntries(ENDPOINT_DEFINITIONS.map(item => [item.key, item.endpoint]));
 
+//is this the issue? I think the site only pulling these demo standards. 
+
 const DEMO_STANDARDS = [
   { id: 'MATH-ALG-01', code: 'ALG.1', subject: 'Mathematics', subjectKey: 'mathematics', gradeBand: '9-12', course: 'Algebra: Concepts and Connections', description: 'Interpret and compare functions represented algebraically and graphically using data and multiple representations.', tags: ['data', 'functions', 'modeling', 'representation', 'graphing', 'comparison'], skills: ['analyze', 'model', 'interpret', 'compare'] },
   { id: 'MATH-GEOM-01', code: 'GEO.2', subject: 'Mathematics', subjectKey: 'mathematics', gradeBand: '9-12', course: 'Geometry: Concepts and Connections', description: 'Model real-world situations with geometric relationships and justify conclusions using evidence.', tags: ['modeling', 'evidence', 'relationships', 'spatial reasoning', 'real-world'], skills: ['justify', 'model', 'reason'] },
@@ -63,6 +65,8 @@ const DEMO_STANDARDS = [
   { id: 'CTAE-IT-01', code: 'IT-FND-2', subject: 'CTAE', subjectKey: 'ctae', gradeBand: '9-12', course: 'Information Technology', cluster: 'Information Technology', description: 'Use computational thinking, data, and digital tools to design and communicate solutions.', tags: ['computational thinking', 'data', 'design', 'communication', 'technology'], skills: ['design', 'communicate', 'solve', 'analyze'] },
   { id: 'WL-SP-01', code: 'WL.SP1.IPA.1', subject: 'World Languages', subjectKey: 'worldLanguages', gradeBand: '9-12', course: 'Spanish I', description: 'Interpret and present information about culture and community practices using authentic resources.', tags: ['culture', 'community', 'resources', 'presentation', 'authentic text'], skills: ['interpret', 'present', 'communicate'] }
 ];
+
+//Do I need to add this for all subjects? Easy enough if I do...
 
 const SUBJECT_PREFIX_MAP = {
   mathematics: [
