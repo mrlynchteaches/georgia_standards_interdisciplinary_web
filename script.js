@@ -349,11 +349,11 @@ async function fetchConfiguredSubjectsIfNeeded() {
       state.loadLog.push({ label: def.label, ok: false, count: 0 });
     }
   });
-  const merged = new Map(DEMO_STANDARDS.map(item => [item.id, { ...item, source: 'demo' }]));
-  normalized.forEach(item => merged.set(item.id, item));
-  state.standards = [...merged.values()];
-  refreshCourseOptions(); refreshPickerResults(); populateFilterOptions();
-  publishDiagnostics();
+  const merged = new Map();  // ← Changed from: new Map(DEMO_STANDARDS.map(...))
+   normalized.forEach(item => merged.set(item.id, item));
+   state.standards = [...merged.values()];
+   refreshCourseOptions(); refreshPickerResults(); populateFilterOptions();
+   publishDiagnostics();
 }
 
 
