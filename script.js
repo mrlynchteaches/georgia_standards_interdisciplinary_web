@@ -15,7 +15,7 @@ const STORAGE_KEYS = {
 };
 
 const STATE_FUNDED_COURSE_LIST_JSON = 'state_funded_course_list.json';
-};
+
 
 const ENDPOINT_DEFINITIONS = [
   { key: 'mathematics', group: 'Core disciplines', label: 'Mathematics', subjectKey: 'mathematics', subjectLabel: 'Mathematics', endpoint: 'mathematics.json' },
@@ -365,7 +365,7 @@ async function loadJsonFile(path, label = 'JSON file') {
 async function ensureCourseCatalogLoaded() {
   if (state.courseCatalog.loaded) return;
   try {
-    const data = await loadJsonFile(STATE_FUNDED_COURSE_LIST, 'state_funded_course-list');
+    const data = await loadJsonFile(STATE_FUNDED_COURSE_LIST_JSON, 'state_funded_course_list.json');
     const catalog = parseCourseCatalogPayload(data);
     state.courseCatalog = { ...catalog, loaded: true };
     window.__standardsWebCourseCatalog = state.courseCatalog;
