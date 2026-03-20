@@ -365,7 +365,7 @@ async function loadJsonFile(path, label = 'JSON file') {
 async function ensureCourseCatalogLoaded() {
   if (state.courseCatalog.loaded) return;
   try {
-    const data = await loadJsonFile(STATE_FUNDED_COURSE_LIST_JSON, 'state-funded course list');
+    const data = await loadJsonFile(STATE_FUNDED_COURSE_LIST, 'state_funded_course-list');
     const catalog = parseCourseCatalogPayload(data);
     state.courseCatalog = { ...catalog, loaded: true };
     window.__standardsWebCourseCatalog = state.courseCatalog;
