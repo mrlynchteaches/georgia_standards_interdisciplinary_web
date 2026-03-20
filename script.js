@@ -107,13 +107,12 @@ function init() {
   loadEndpointConfig();
   buildStaticUi();
   bindEvents();
-  loadDemoData({ silent: true });
   renderSelectedChips();
   restoreDraft();
 }
 
 function cacheElements() {
-  ['subjectSelect','gradeBandSelect','courseSelect','keywordInput','standardSearchInput','openPickerBtn','pickerResults','selectedStandards','manualTargets','searchForm','findConnectionsBtn','statusBadge','apiConfigGrid','graphContainer','emptyState','resultsList','resultsSubhead','filterSubject','filterGradeBand','filterCourse','filterStrength','filterKeyword','saveMapBtn','printBtn','resetBtn','loadDemoBtn','saveConfigBtn','clearConfigBtn','nodeDialog','dialogTitle','dialogBody','graphLoadLabel'].forEach(id => el[id] = document.getElementById(id));
+  ['subjectSelect','gradeBandSelect','courseSelect','keywordInput','standardSearchInput','openPickerBtn','pickerResults','selectedStandards','manualTargets','searchForm','findConnectionsBtn','statusBadge','apiConfigGrid','graphContainer','emptyState','resultsList','resultsSubhead','filterSubject','filterGradeBand','filterCourse','filterStrength','filterKeyword','saveMapBtn','printBtn','resetBtn','saveConfigBtn','clearConfigBtn','nodeDialog','dialogTitle','dialogBody','graphLoadLabel'].forEach(id => el[id] = document.getElementById(id));
   el.resultCardTemplate = document.getElementById('resultCardTemplate');
 }
 
@@ -140,7 +139,6 @@ function bindEvents() {
   el.saveMapBtn.addEventListener('click', saveLessonMap);
   el.printBtn.addEventListener('click', () => window.print());
   el.resetBtn.addEventListener('click', resetAll);
-  el.loadDemoBtn.addEventListener('click', () => loadDemoData({ silent: false }));
   el.saveConfigBtn.addEventListener('click', saveEndpointConfigFromUi);
   el.clearConfigBtn.addEventListener('click', clearEndpointConfig);
   window.addEventListener('beforeunload', saveDraft);
@@ -193,12 +191,6 @@ function clearEndpointConfig() {
   localStorage.removeItem(STORAGE_KEYS.endpointConfig);
   buildApiConfigGrid();
   setStatus('JSON file config reset to defaults');
-}
-
-function loadDemoData({ silent = true } = {}) {
-  state.standards = DEMO_STANDARDS.map(item => ({ ...item, source: 'demo' }));
-  refreshCourseOptions(); refreshPickerResults(); populateFilterOptions(); updateGraphFooter();
-  if (!silent) setStatus('Demo data loaded (local JSON ready)');
 }
 
 function restoreDraft() {
