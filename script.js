@@ -256,6 +256,14 @@ function collectCoursesForSubject(subjectKey = '', gradeBand = '') {
 function refreshPickerResults() {
   const query = el.standardSearchInput.value.trim().toLowerCase();
   const matches = filterStandardsForPicker().filter(item => !query || searchableText(item).includes(query)).slice(0, 50);
+if (matches.length === 0 && query === '') {
+  // If no search query and no matches, show all standards instead
+  const allMatches = filterStandardsForPicker().slice(0, 50);
+  state.visiblePickerItems = allMatches;
+} 
+else {
+  state.visiblePickerItems = matches;
+}
   state.visiblePickerItems = matches;
   el.pickerResults.innerHTML = '';
   if (!matches.length) {
