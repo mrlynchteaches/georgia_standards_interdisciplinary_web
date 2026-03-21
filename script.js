@@ -425,8 +425,14 @@ async function fetchSubjectStandards(def) {
 function normalizeCasePayload(data, def) {
   const arrays = extractCaseArrays(data);
   const normalized = [];
+  let currentCourse = null;
+  
   arrays.forEach(arr => arr.forEach((item, index) => {
-    const norm = normalizeCaseEntry(item, def, index);
+    if (item.CFItemType === 'Course') {
+      currentCourse = item.fullStatement || item.statementLabel || '';
+      return;
+    }
+    const norm = normalizeCaseEntry(item, def, index, currentCourse);
     if (norm) normalized.push(norm);
   }));
   return dedupeBy(normalized, item => item.id);
@@ -444,7 +450,7 @@ function extractCaseArrays(data) {
   return arrays;
 }
 
-function normalizeCaseEntry(item, def, index = 0) {
+function normalizeCaseEntry(item, def, index = 0, parentCourse = null) {
   if (!item || typeof item !== 'object') return null;
   const code = firstNonEmpty(item.humanCodingScheme, item.identifier, item.abbreviatedStatement, item.fullStatement, `${def.label}-${index + 1}`);
   const description = firstNonEmpty(item.fullStatement, item.statementLabel, item.description, item.notes, '');
@@ -452,7 +458,7 @@ function normalizeCaseEntry(item, def, index = 0) {
   const educationText = Array.isArray(item.educationLevel) ? item.educationLevel.join(' ') : firstNonEmpty(item.educationLevel, item.gradeLevel, '');
   const gradeBand = inferGradeBandFromText(`${code} ${description} ${educationText}`);
   const explicitCourse = pickExplicitCourse(item, def);
-  const resolved = resolveCourseAssignment({ item, def, code, description, explicitCourse });
+  const resolved = resolveCourseAssignment({ item, def, code, description, explicitCourse, parentCourse });
   const course = resolved.course || 'Unspecified course';
   const tokens = tokenize(`${code} ${description} ${course}`);
   return {
@@ -497,8 +503,9 @@ function pickExplicitCourse(item, def) {
   return '';
 }
 
-function resolveCourseAssignment({ item, def, code, description, explicitCourse }) {
+function resolveCourseAssignment({ item, def, code, description, explicitCourse, parentCourse }) {
   if (explicitCourse) return { course: explicitCourse, source: 'explicit' };
+  if (parentCourse) return { course: parentCourse, source: 'parent-course' };
   if (def.cluster) return { course: def.cluster, source: 'definition-cluster' };
   if (def.subdiscipline) return { course: def.subdiscipline, source: 'definition-subdiscipline' };
 
