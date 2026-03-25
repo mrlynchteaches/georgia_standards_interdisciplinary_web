@@ -1,0 +1,184 @@
+--- a/script.js
++++ b/script.js
+@@
+ function collectGradeBandOptions() {
+- return [...new Set(['K-5','6-8','9-10','11-12','9-12','Unspecified'])].map(v => ({ value: v, label: v }));
++ return [
++  { value: 'Elementary', label: 'Elementary' },
++  { value: 'Middle School', label: 'Middle School' },
++  { value: 'High School', label: 'High School' }
++ ];
+ }
+@@
+ function extractCaseArrays(data) {
+  const arrays = [];
+  if (Array.isArray(data)) arrays.push(data);
+  if (Array.isArray(data?.CFItems)) arrays.push(data.CFItems);
+  if (Array.isArray(data?.items)) arrays.push(data.items);
+  if (Array.isArray(data?.children)) arrays.push(data.children);
+  if (Array.isArray(data?.CFPackage?.CFItems)) arrays.push(data.CFPackage.CFItems);
+  if (Array.isArray(data?.CFPackage?.items)) arrays.push(data.CFPackage.items);
+  if (!arrays.length && data && typeof data === 'object' && (data.humanCodingScheme || data.fullStatement || data.statementLabel)) arrays.push([data]);
+  return arrays;
+ }
++const ELEMENTARY_CODES = new Set(['KG', '01', '02', '03', '04', '05']);
++const MIDDLE_CODES = new Set(['06', '07', '08']);
++const HIGH_CODES = new Set(['09', '10', '11', '12']);
++
++function normalizeEducationToken(token) {
++ const value = String(token ?? '').trim().toUpperCase();
++
++ if (!value) return '';
++
++ if (value === 'K' || value === 'KG' || value === 'KINDERGARTEN') return 'KG';
++
++ const cleaned = value
++ .replace(/^GRADE\s*/i, '')
++ .replace(/^GR\s*/i, '')
++ .trim();
++
++ if (/^\d$/.test(cleaned)) return cleaned.padStart(2, '0');
++ if (/^\d{2}$/.test(cleaned)) return cleaned;
++
++ return cleaned;
++}
++
++function expandEducationRangeToken(token) {
++ const raw = String(token ?? '').trim().toUpperCase();
++ if (!raw) return [];
++
++ const compact = raw.replace(/\s+/g, '');
++
++ if (/^(KG|K|KINDERGARTEN)-(05|5)$/.test(compact)) {
++ return ['KG', '01', '02', '03', '04', '05'];
++ }
++
++ if (/^(KG|K|KINDERGARTEN)-(02|2)$/.test(compact)) {
++ return ['KG', '01', '02'];
++ }
++
++ if (/^(03)-(05|5)$/.test(compact)) {
++ return ['03', '04', '05'];
++ }
++
++ if (/^(06|6)-(08|8)$/.test(compact)) {
++ return ['06', '07', '08'];
++ }
++
++ if (/^(09|9)-12$/.test(compact)) {
++ return ['09', '10', '11', '12'];
++ }
++
++ return [normalizeEducationToken(raw)];
++}
++
++function extractEducationCodes(educationLevel) {
++ const rawValues = Array.isArray(educationLevel) ? educationLevel : [educationLevel];
++
++ return [...new Set(
++ rawValues
++ .flatMap(value => String(value ?? '').split(/[;,/]+/))
++ .flatMap(part => expandEducationRangeToken(part))
++ .map(normalizeEducationToken)
++ .filter(Boolean)
++ )];
++}
++
++function inferGradeBandFromEducationLevel(educationLevel, fallbackText = '') {
++ const codes = extractEducationCodes(educationLevel);
++
++ if (codes.length) {
++ if (codes.every(code => ELEMENTARY_CODES.has(code))) return 'Elementary';
++ if (codes.every(code => MIDDLE_CODES.has(code))) return 'Middle School';
++ if (codes.every(code => HIGH_CODES.has(code))) return 'High School';
++ }
++
++ const t = String(fallbackText ?? '').toLowerCase();
++
++ if (/\b(elementary|k-5|k-2|3-5|kindergarten|grade\s*(k|[1-5]))\b/.test(t)) {
++ return 'Elementary';
++ }
++
++ if (/\b(middle school|middle grades|6-8|grade\s*([6-8]))\b/.test(t)) {
++ return 'Middle School';
++ }
++
++ if (/\b(high school|9-12|secondary|grade\s*(9|10|11|12))\b/.test(t)) {
++ return 'High School';
++ }
++
++ return 'Unspecified';
++}
++
+ function normalizeCaseEntry(item, def, index = 0, parentCourse = null) {
+  if (!item || typeof item !== 'object') return null;
+  const code = firstNonEmpty(item.humanCodingScheme, item.identifier, item.abbreviatedStatement, item.fullStatement, `${def.label}-${index + 1}`);
+  const description = firstNonEmpty(item.fullStatement, item.statementLabel, item.description, item.notes, '');
+  if (!description && !code) return null;
+- const educationText = Array.isArray(item.educationLevel) ? item.educationLevel.join(' ') : firstNonEmpty(item.educationLevel, item.gradeLevel, '');
+- const gradeBand = inferGradeBandFromText(`${code} ${description} ${educationText}`);
++ const gradeBand = inferGradeBandFromEducationLevel(
++  item.educationLevel ?? item.gradeLevel,
++  `${code} ${description}`
++ );
+  const explicitCourse = pickExplicitCourse(item, def);
+  const resolved = resolveCourseAssignment({ item, def, code, description, explicitCourse, parentCourse });
+  const course = resolved.course || 'Unspecified course';
+  const tokens = tokenize(`${code} ${description} ${course}`);
+@@
+ function pickExplicitCourse(item, def) {
+  const candidates = [
+  item.course,
+  item.courseTitle,
+  item.listEnumeration,
+  item.subject,
+  item.parentTitle,
+  item.parentLabel,
+  item.educationLevel && !Array.isArray(item.educationLevel) ? item.educationLevel : '',
+  def.courseLabel,
+  def.cluster,
+  def.subdiscipline
+  ].filter(Boolean);
+- const generic = new Set(['mathematics','science','social studies','english language arts','fine arts','ctae','world languages','k-5','6-8','9-12','11-12','9-10']);
++ const generic = new Set([
++  'mathematics',
++  'science',
++  'social studies',
++  'english language arts',
++  'fine arts',
++  'ctae',
++  'world languages',
++  'k-5',
++  'k-2',
++  '3-5',
++  '6-8',
++  '9-10',
++  '11-12',
++  '9-12',
++  'elementary',
++  'middle school',
++  'high school',
++  'kg',
++  '01',
++  '02',
++  '03',
++  '04',
++  '05',
++  '06',
++  '07',
++  '08',
++  '09',
++  '10',
++  '11',
++  '12'
++ ]);
+  for (const candidate of candidates) {
+  const cleaned = normalizeCourseTitle(candidate);
+  if (!cleaned) continue;
+  if (generic.has(cleaned.toLowerCase())) continue;
+  if (/^\d{2}$/.test(cleaned)) continue;
+  return cleaned;
+  }
+  return '';
+ }
+``
