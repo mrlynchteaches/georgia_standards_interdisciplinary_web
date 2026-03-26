@@ -603,14 +603,14 @@ function scoreConnection(a, b) {
   const tagScore = jaccard(a.tags || [], b.tags || []);
   const skillScore = jaccard(a.skills || [], b.skills || []);
   const textScore = jaccard(tokenize(a.description), tokenize(b.description));
-  const courseScore = a.course === b.course ? 0.08 : 0;
-  const cultureBoost = sharedTerms(a, b).includes('culture') ? 0.04 : 0;
-  return (tagScore * 0.42) + (textScore * 0.2) + courseScore + cultureBoost;
+  const courseScore = a.course === b.course ? 0.25 : 0;
+  const cultureBoost = sharedTerms(a, b).includes('culture') ? 0.25 : 0;
+  return (tagScore + 1) + (textScore + 1) + (skillScore - 1) + courseScore + cultureBoost;
 }
 
 function classifyStrength(score) {
-  if (score >= 0.50) return 'strong';
-  if (score >= 0.25) return 'medium';
+  if (score >= 2.25) return 'strong';
+  if (score >= 1.25) return 'medium';
   return 'weak';
 }
 
