@@ -16,8 +16,6 @@ const STORAGE_KEYS = {
 
 const STATE_FUNDED_COURSE_LIST_JSON = 'state_funded_course_list.json';
 
-const STOP_SKILLS = new Set ('analyze','evaluate','communicate','model','justify','compare','interpret','present','create','design','solve','write','reason','investigate','explain','support','apply','obtain','develop'])
-
 const ENDPOINT_DEFINITIONS = [
   { key: 'mathematics', group: 'Core disciplines', label: 'Mathematics', subjectKey: 'mathematics', subjectLabel: 'Mathematics', endpoint: 'mathematics.json' },
   { key: 'science', group: 'Core disciplines', label: 'Science', subjectKey: 'science', subjectLabel: 'Science', endpoint: 'science.json' },
@@ -51,10 +49,7 @@ const ENDPOINT_DEFINITIONS = [
   { key: 'physicalEducation', group: 'Optional additional frameworks', label: 'Physical Education', subjectKey: 'science', subjectLabel: 'Science', courseLabel: 'Physical Education', endpoint: 'physicalEducation.json' }
 ];
 
-const DEFAULT_ENDPOINTS = Object.fromEntries(ENDPOINT_DEFINITIONS.map(item => [item.key, item.endpoint]));
-
-//is this the issue? I think the site only pulling these demo standards. 
-//Site was definitely pulling only the demo standards that were listed here. I've removed them.
+const DEFAULT_ENDPOINTS = Object.fromEntries(ENDPOINT_DEFINITIONS.map(item => [item.key, item.endpoint]))
 
 //Do I need to add this for all subjects? Easy enough if I do...
 
@@ -529,7 +524,7 @@ function inferCourseFromCodeAndText(code, description, subjectKey) {
   const source = `${code} ${description}`;
   const rules = SUBJECT_PREFIX_MAP[subjectKey] || [];
   for (const rule of rules) {
-    if (rule.pattern.test(source)) return rule.course;
+le.course;
   }
   return '';
 }
@@ -566,7 +561,7 @@ function inferGradeBandFromText(text) {
   if (/grade\s?(9|10|11|12)\b|high school|9-12|secondary/.test(t)) return '9-12';
   return 'Unspecified';
 }
-
+// I want to add the below items to the scoring mechanism and devalue these terms, as they are usually the first item in the standard. Add to formula on line 610.
 function inferSkills(tokens) {
   const known = ['analyze','evaluate','communicate','model','justify','compare','interpret','present','create','design','solve','write','reason','investigate','explain','support','apply','obtain','develop'];
   return known.filter(skill => tokens.includes(skill));
