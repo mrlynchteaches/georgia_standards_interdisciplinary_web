@@ -602,7 +602,7 @@ function buildConnections(selectedStandards, manualTargets = []) {
   });
   return [...resultsMap.values()].sort((a, b) => b.score - a.score);
 }
-
+//elimiated + skill score to reduce focus on above listed skills as emphasis of results. 
 function scoreConnection(a, b) {
   const tagScore = jaccard(a.tags || [], b.tags || []);
   const skillScore = jaccard(a.skills || [], b.skills || []);
