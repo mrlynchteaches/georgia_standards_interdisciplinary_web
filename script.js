@@ -598,14 +598,14 @@ function buildConnections(selectedStandards, manualTargets = []) {
   });
   return [...resultsMap.values()].sort((a, b) => b.score - a.score);
 }
-//elimiated + skill score to reduce focus on above listed skills as emphasis of results. 
+//elimiated + skill score to reduce focus on above listed skills as emphasis of results. Unfortunately, now 40,000 results are causing the site to stall out and crash. 
 function scoreConnection(a, b) {
   const tagScore = jaccard(a.tags || [], b.tags || []);
   const skillScore = jaccard(a.skills || [], b.skills || []);
   const textScore = jaccard(tokenize(a.description), tokenize(b.description));
   const courseScore = a.course === b.course ? 0.08 : 0;
   const cultureBoost = sharedTerms(a, b).includes('culture') ? 0.04 : 0;
-  return (tagScore * 0.42) + (textScore * 0.2) + courseScore + cultureBoost;
+  return (tagScore * 0.42) + (textScore * 0.2) + (skillScore - 1) + courseScore + cultureBoost;
 }
 
 function classifyStrength(score) {
