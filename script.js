@@ -609,12 +609,12 @@ function scoreConnection(a, b) {
   const textScore = jaccard(tokenize(a.description), tokenize(b.description));
   const courseScore = a.course === b.course ? 0.08 : 0;
   const cultureBoost = sharedTerms(a, b).includes('culture') ? 0.04 : 0;
-  return (tagScore * 0.42) + (skillScore * 0.34) + (textScore * 0.2) + courseScore + cultureBoost;
+  return (tagScore * 0.42) + (textScore * 0.2) + courseScore + cultureBoost;
 }
 
 function classifyStrength(score) {
-  if (score >= 0.34) return 'strong';
-  if (score >= 0.22) return 'medium';
+  if (score >= 0.50) return 'strong';
+  if (score >= 0.25) return 'medium';
   return 'weak';
 }
 
