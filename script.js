@@ -16,6 +16,7 @@ const STORAGE_KEYS = {
 
 const STATE_FUNDED_COURSE_LIST_JSON = 'state_funded_course_list.json';
 
+const STOP_SKILLS = new Set ('analyze','evaluate','communicate','model','justify','compare','interpret','present','create','design','solve','write','reason','investigate','explain','support','apply','obtain','develop'])
 
 const ENDPOINT_DEFINITIONS = [
   { key: 'mathematics', group: 'Core disciplines', label: 'Mathematics', subjectKey: 'mathematics', subjectLabel: 'Mathematics', endpoint: 'mathematics.json' },
@@ -609,7 +610,7 @@ function scoreConnection(a, b) {
   const textScore = jaccard(tokenize(a.description), tokenize(b.description));
   const courseScore = a.course === b.course ? 0.08 : 0;
   const cultureBoost = sharedTerms(a, b).includes('culture') ? 0.04 : 0;
-  return (tagScore * 0.42) + (skillScore /0.34) + (textScore * 0.2) + courseScore + cultureBoost;
+  return (tagScore * 0.42) + (textScore * 0.2) + courseScore + cultureBoost;
 }
 
 function classifyStrength(score) {
